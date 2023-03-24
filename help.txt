@@ -1,0 +1,80 @@
+STS Assume Role based S3 connection.
+Note : For this example i am using AWS SDK2.X
+
+1. To create S3 bucket in AWS - like : test_bucket
+
+2. Create Policy in IAM and add following json directly with your bucket name- 
+		{
+	    "Version": "2012-10-17",
+	    "Statement": [
+	        {
+	            "Effect": "Allow",
+	            "Action": [
+	                "s3:Get*",
+	                "s3:List*",
+	                "s3:Put*",
+	            ],
+	            "Resource": [
+	                "arn:aws:s3:::test_bucket",
+	                "arn:aws:s3:::test_bucket/*"
+	            ]
+	        }
+	      ]
+		}
+
+	provide valid name to this policy as 'pl_s3bucket_access' and save.
+	
+3. Create Role in IAM and the above policy to this role while creating or after role creation.
+	provide valid name to the role as 'rl_s3bucket_access' and save.
+	
+	Goto TrustRelationship tab and put the following JSON into this TrustRelationship.
+	for your user you can add user as - "AWS": "arn:aws:iam::897656543212:user/SudarshanNagreAPI"
+	for the lambda service add service as - "Service": "lambda.amazonaws.com",
+
+		{
+		    "Version": "2012-10-17",
+		    "Statement": [
+		        {
+		            "Effect": "Allow",
+		            "Principal": {
+		                "Service": "lambda.amazonaws.com",
+		                "AWS": "arn:aws:iam::897656543212:user/SudarshanAPI"
+		            },
+		            "Action": "sts:AssumeRole"
+		        }
+		    ]
+		}
+
+4. Open the Role which you have created and copy the Role ARN ("arn:aws:iam::897656543212:role/rl_s3bucket_access") 
+	and used it inside the code for the connection.
+
+5. Add following dependencies in your springboot project.
+/*
+ * Ref : https://docs.aws.amazon.com/IAM/latest/UserGuide/example_iam_Scenario_CreateUserAssumeRole_section.html
+ * Ref S3 Operations : https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/examples-s3-objects.html
+ * Ref Git : https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/javav2/example_code/iam/pom.xml
+ *  
+ 		<dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sts</artifactId>
+        </dependency>
+        
+        <dependencyManagement>
+		<dependencies>
+			
+			<dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>2.17.230</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+			
+		</dependencies>
+	</dependencyManagement>
+ 
+ */
